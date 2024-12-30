@@ -83,6 +83,8 @@ conc_only_norm <- list()
 n_conc <- data.frame(matrix(nrow = n_pairs, ncol = 3))
 colnames(n_conc) <- c("Dataset1", "Dataset2", "Num_concordant")
 k <- 1 # Counter for the conc_only_norm list
+
+library(matrixStats)
 for(i in 1:(length(all_norm) - 1)) {
   
   for(j in (i + 1):length(all_norm)) {
@@ -123,6 +125,7 @@ n_conc_m_norm <- rbind(n_conc, n_conc2, self)
 n_conc_m_norm <- mutate(n_conc_m_norm, Dataset2 = factor(Dataset2, levels = names(cdist_norm)),
                    Dataset1 = factor(Dataset1, levels = names(cdist_norm)))
 
+library(reshape2)
 n_conc_m_norm <- t(dcast(n_conc_m_norm, Dataset1 ~ Dataset2)) # Wide format
 colnames(n_conc_m_norm) <- n_conc_m_norm[1, ]
 n_conc_m_norm <- n_conc_m_norm[-1, ]
