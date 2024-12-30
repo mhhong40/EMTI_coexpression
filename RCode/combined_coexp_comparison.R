@@ -46,6 +46,8 @@ conc_only <- list()
 n_conc <- data.frame(matrix(nrow = n_pairs, ncol = 3))
 colnames(n_conc) <- c("Dataset1", "Dataset2", "Num_concordant")
 k <- 1 # Counter for the conc_only list
+
+library(matrixStats)
 for(i in 1:(length(cdist_all) - 1)) {
   
   for(j in (i + 1):length(cdist_all)) {
@@ -87,6 +89,7 @@ n_conc_f <- distinct(n_conc_f) # Remove duplicate self-correlations
 n_conc_f <- mutate(n_conc_f, Dataset1 = factor(Dataset1, levels = names(cdist_all)),
                  Dataset2 = factor(Dataset2, levels = names(cdist_all)))
 
+library(reshape2)
 n_conc_f <- t(dcast(n_conc_f, Dataset1 ~ Dataset2)) # Wide format
 colnames(n_conc_f) <- n_conc_f[1, ]
 n_conc_f <- n_conc_f[-1, ]
@@ -168,21 +171,20 @@ c_epi_ba <- c_epi_ba[which(sign(c_epi_ba$Correlation) == sign(ref$Correlation)),
 
 
 ## All cycling epithelial only with each normal epithelial lineage
-# LP
 c_cyc_lp <- sig$`Luminal Progenitor`[which(sig$`Luminal Progenitor`$Pair %in% c_cyc), ] 
-ref <- sig$`Cycling Epithelial 1`[which(sig$`Epithelial 1`$Pair %in% c_cyc_lp$Pair), ]
+ref <- sig$`Cycling Epithelial 1`[which(sig$`Cycling Epithelial 1`$Pair %in% c_cyc_lp$Pair), ]
 c_cyc_lp <- c_cyc_lp[which(sign(c_cyc_lp$Correlation) == sign(ref$Correlation)), ] # Check that the signs match
 
 # ML
 c_cyc_ml <- sig$`Mature Luminal`[which(sig$`Mature Luminal`$Pair %in% c_cyc), ]
-ref <- sig$`Cycling Epithelial 1`[which(sig$`Epithelial 1`$Pair %in% c_cyc_ml$Pair), ]
+ref <- sig$`Cycling Epithelial 1`[which(sig$`Cycling Epithelial 1`$Pair %in% c_cyc_ml$Pair), ]
 c_cyc_ml <- c_cyc_ml[which(sign(c_cyc_ml$Correlation) == sign(ref$Correlation)), ] 
 
 # Basal
 c_cyc_ba <- sig$`Basal Epithelial`[which(sig$`Basal Epithelial`$Pair %in% c_cyc), ]
-ref <- sig$`Cycling Epithelial 1`[which(sig$`Epithelial 1`$Pair %in% c_cyc_ba$Pair), ]
-c_cyc_ba <- c_cyc_ba[which(sign(c_cyc_ba$Correlation) == sign(ref$Correlation)), ]
-
+ref <- sig$`Cycling Epithelial 1`[which(sig$`Cycling Epithelial 1`$Pair %in% c_cyc_ba$Pair), ]
+c_cyc_ba <- c_cyc_ba[which(sign(c_cyc_ba$Correlation) == sign(ref$Correlation)), ] 
+                     
 ## Both bulk datasets only
 c_bulk_all <- pairs_only[[7]]
 c_bulk_all <- c_bulk_all[which(!(c_bulk_all$Pair %in% unlist(pairs_only[-7]))), ] # Pairs that aren't concordant anywhere else
